@@ -1,20 +1,57 @@
+#include <cstdint>
+#include <stdlib.h>
+#include <vector>
+
 class Perceptron {
     public:
-        Perceptron(uint32_t gh_size, int32_t init_weight) {
-            size = gh_size;
+        Perceptron(int global_hist_size) {
+            size = global_hist_size + 1;
             theta = 1.93*size + 14;
-            last_prediction = 0;
-            weights = std::vector<int32_t>(size, init_weight);
+            weights = std::vector<int>(size, 0);
         }
 
-        // check if global_hist is 0 or -1
-        uint32_t predict(uint64_t global_hist) {
-            uint32_t prediction = weights[0];
+        Perceptron(int global_hist_size, int init_weight) {
+            size = global_hist_size + 1;
+            theta = 1.93*size + 14;
+            weights = std::vector<int>(size, init_weight);
+        }
+
+        bool predict(uint64_t global_hist) {
+            last_input = (global_hist << 1) | 0x1;
+            int y = weights[0];
+            for (int i = 1; i < size; i++) {
+                if ((last_input >> i) & 0x1) {
+                    y += weights[i];
+                }
+                else {
+                    y -= weights[i];
+                }
+            }
+            last_prediction = y;
+            return y >= 0;
+        }
+
+        void train(bool taken) {
+            // Update weights if we made the wrong prediction
+            //  or the magnitude of y was less than or eq to theta.
+            bool predict_taken = last_prediction >= 0;
+            if ((taken != predict_taken) || (abs(last_prediction) <= theta)) {
+                for (int i = 0; i < size; i++) {
+                    bool x = (last_input >> i) & 0x1;
+                    if (x == taken) {
+                        weights[i]++;
+                    }
+                    else {
+                        weights[i]--;
+                    }
+                }
+            }
         }
 
     private:
-        std::vector<int32_t> weights;
-        uint32_t theta;
-        uint32_t size;
+        std::vector<int> weights;
+        int theta;
+        int size;   // max size 63
+        uint64_t last_input;
         bool last_prediction;
-}
+};
