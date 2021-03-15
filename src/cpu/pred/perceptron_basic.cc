@@ -34,30 +34,9 @@
 #include "debug/Fetch.hh"
 
 PerceptronBasicBP::PerceptronBasicBP(const PerceptronBasicBPParams *params)
-    : BPredUnit(params),
-      localPredictorSize(params->localPredictorSize),
-      localCtrBits(params->localCtrBits),
-      localPredictorSets(localPredictorSize / localCtrBits),
-      localCtrs(localPredictorSets, SatCounter(localCtrBits)),
-      indexMask(localPredictorSets - 1)
 {
-    if (!isPowerOf2(localPredictorSize)) {
-        fatal("Invalid local predictor size!\n");
-    }
 
-    if (!isPowerOf2(localPredictorSets)) {
-        fatal("Invalid number of local predictor sets! Check localCtrBits.\n");
-    }
-
-    DPRINTF(Fetch, "index mask: %#x\n", indexMask);
-
-    DPRINTF(Fetch, "local predictor size: %i\n",
-            localPredictorSize);
-
-    DPRINTF(Fetch, "local counter bits: %i\n", localCtrBits);
-
-    DPRINTF(Fetch, "instruction shift amount: %i\n",
-            instShiftAmt);
+    //DPRINTF(Fetch, "index mask: %#x\n", indexMask);
 }
 
 void
@@ -72,20 +51,8 @@ PerceptronBasicBP::btbUpdate(ThreadID tid, Addr branch_addr,
 bool
 PerceptronBasicBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
-    bool taken;
-    unsigned local_predictor_idx = getLocalIndex(branch_addr);
-
-    DPRINTF(Fetch, "Looking up index %#x\n",
-            local_predictor_idx);
-
-    uint8_t counter_val = localCtrs[local_predictor_idx];
-
-    DPRINTF(Fetch, "prediction is %i.\n",
-            (int)counter_val);
-
-    taken = getPrediction(counter_val);
-
-    return taken;
+    size_t index = computeIndex(branch_addr);
+    return allPerceptron[index].predict(globalHistory);
 }
 
 void
@@ -94,42 +61,9 @@ PerceptronBasicBP::update(ThreadID tid, Addr branch_addr,
                 bool squashed, const StaticInstPtr & inst,
                 Addr corrTarget)
 {
-    assert(bp_history == NULL);
-    unsigned local_predictor_idx;
-
-    // No state to restore, and we do not update on the wrong
-    // path.
-    if (squashed) {
-        return;
-    }
-
-    // Update the local predictor.
-    local_predictor_idx = getLocalIndex(branch_addr);
-
-    DPRINTF(Fetch, "Looking up index %#x\n", local_predictor_idx);
-
-    if (taken) {
-        DPRINTF(Fetch, "Branch updated as taken.\n");
-        localCtrs[local_predictor_idx]++;
-    } else {
-        DPRINTF(Fetch, "Branch updated as not taken.\n");
-        localCtrs[local_predictor_idx]--;
-    }
-}
-
-inline
-bool
-PerceptronBasicBP::getPrediction(uint8_t &count)
-{
-    // Get the MSB of the count
-    return (count >> (localCtrBits - 1));
-}
-
-inline
-unsigned
-PerceptronBasicBP::getLocalIndex(Addr &branch_addr)
-{
-    return (branch_addr >> instShiftAmt) & indexMask;
+    size_t index = computeIndex(branch_addr);
+    allPerceptron[index].train(taken);
+    updateGlobalHist(taken);
 }
 
 void

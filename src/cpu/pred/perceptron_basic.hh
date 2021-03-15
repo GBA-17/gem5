@@ -74,31 +74,6 @@ class PerceptronBasicBP : public BPredUnit
     { assert(bp_history == NULL); }
 
   private:
-    /**
-     *  Returns the taken/not taken prediction given the value of the
-     *  counter.
-     *  @param count The value of the counter.
-     *  @return The prediction based on the counter value.
-     */
-    inline bool getPrediction(uint8_t &count);
-
-    /** Calculates the local index based on the PC. */
-    inline unsigned getLocalIndex(Addr &PC);
-
-    /** Size of the local predictor. */
-    const unsigned localPredictorSize;
-
-    /** Number of bits of the local predictor's counters. */
-    const unsigned localCtrBits;
-
-    /** Number of sets. */
-    const unsigned localPredictorSets;
-
-    /** Array of counters that make up the local predictor. */
-    std::vector<SatCounter> localCtrs;
-
-    /** Mask to get index bits. */
-    const unsigned indexMask;
     
     size_t computeIndex(Addr branch_addr);
 
