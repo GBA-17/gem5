@@ -138,6 +138,18 @@ PerceptronBasicBP::uncondBranch(ThreadID tid,
 {
 }
 
+size_t PerceptronBasicBP::computeIndex(Addr branch_addr) {
+    return (branch_addr >> 5) & hash;
+}
+
+void PerceptronBasicBP::updateGlobalHist(bool taken) {
+    if(taken == true) {
+        globalHistory = (globalHistory << 1) | 1;
+    } else {
+        globalHistory = (globalHistory << 1);
+    }
+}
+
 PerceptronBasicBP*
 PerceptronBasicBPParams::create()
 {
