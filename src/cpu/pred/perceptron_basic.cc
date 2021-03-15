@@ -34,10 +34,15 @@
 #include "debug/Fetch.hh"
 
 PerceptronBasicBP::PerceptronBasicBP(const PerceptronBasicBPParams *params)
-: BPredUnit(params)
+:   BPredUnit(params),
+    globalHistSize(params->globalHistSize),
+    numPerceptrons(params->numPerceptrons),
+    globalHistory(0)
 {
-
-    //DPRINTF(Fetch, "index mask: %#x\n", indexMask);
+    perceptronTable.reserve(numPerceptrons);
+    for (int i = 0; i < numPerceptrons; i++) {
+        perceptronTable.push_back(Perceptron(globalHistSize));
+    }
 }
 
 void
@@ -53,7 +58,7 @@ bool
 PerceptronBasicBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
     size_t index = computeIndex(branch_addr);
-    return allPerceptron[index].predict(globalHistory);
+    return perceptronTable[index].predict(globalHistory);
 }
 
 void
@@ -63,7 +68,7 @@ PerceptronBasicBP::update(ThreadID tid, Addr branch_addr,
                 Addr corrTarget)
 {
     size_t index = computeIndex(branch_addr);
-    allPerceptron[index].train(taken);
+    perceptronTable[index].train(taken);
     updateGlobalHist(taken);
 }
 
@@ -74,14 +79,14 @@ PerceptronBasicBP::uncondBranch(ThreadID tid,
 }
 
 size_t PerceptronBasicBP::computeIndex(Addr branch_addr) {
-    return (branch_addr >> 5) & hash;
+    // Simple hash function
+    return (branch_addr >> 5) % numPerceptrons;
 }
 
 void PerceptronBasicBP::updateGlobalHist(bool taken) {
-    if(taken == true) {
-        globalHistory = (globalHistory << 1) | 1;
-    } else {
-        globalHistory = (globalHistory << 1);
+    globalHistory <<= 1;
+    if (taken) {
+        globalHistory |= 1;
     }
 }
 

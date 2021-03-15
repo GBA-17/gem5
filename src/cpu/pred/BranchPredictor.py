@@ -83,7 +83,8 @@ class PerceptronBasicBP(BranchPredictor):
 
     localPredictorSize = Param.Unsigned(2048, "Size of local predictor")
     localCtrBits = Param.Unsigned(2, "Bits per counter")
-    testParam = Param.Unsigned(17, "Test parameter")
+    numPerceptrons = Param.Unsigned(16, "Number of perceptrons in table")
+    globalHistSize = Param.Unsigned(32, "Length of global history in bits")
 
 
 class TournamentBP(BranchPredictor):

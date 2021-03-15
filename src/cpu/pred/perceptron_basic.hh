@@ -42,6 +42,7 @@
 #define __CPU_PRED_PERCEPTRON_BASIC_PRED_HH__
 
 #include <vector>
+#include <cstdint>
 #include "cpu/pred/perceptron.hh"
 #include "base/sat_counter.hh"
 #include "base/types.hh"
@@ -79,15 +80,14 @@ class PerceptronBasicBP : public BPredUnit
 
     void updateGlobalHist(bool taken);
 
-    std::vector<Perceptron> allPerceptron;
+    std::vector<Perceptron> perceptronTable;
 
-    size_t globalHistory;
+    uint64_t globalHistory;
 
-    size_t numPerceptron;
+    size_t numPerceptrons;
 
-    size_t numPerceptronParam;
+    size_t globalHistSize;
 
-    size_t hash;
 };
 
 #endif // __CPU_PRED_PERCEPTRON_BASIC_PRED_HH__
