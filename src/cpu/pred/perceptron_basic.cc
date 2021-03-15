@@ -34,6 +34,7 @@
 #include "debug/Fetch.hh"
 
 PerceptronBasicBP::PerceptronBasicBP(const PerceptronBasicBPParams *params)
+: BPredUnit(params)
 {
 
     //DPRINTF(Fetch, "index mask: %#x\n", indexMask);
