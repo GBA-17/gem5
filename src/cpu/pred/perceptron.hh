@@ -53,5 +53,5 @@ class Perceptron {
         int theta;
         int size;   // max size 63
         uint64_t last_input;
-        bool last_prediction;
+        int last_prediction;
 };
