@@ -82,7 +82,7 @@ std::vector<int> PerceptronHashedBP::computeIndex(Addr branch_addr)
 {
     std::vector<int> indexes;
     indexes.push_back(branch_addr % numWeights);
-    int stride = std::max(1, 64 / numPerceptrons);
+    int stride = std::max(1, int(64 / numPerceptrons));
     for (int i = 1; i < numPerceptrons; i++) {
         uint64_t bitmask = generateBitmask(stride*i);
         uint64_t histSegment = globalHistory & bitmask;
