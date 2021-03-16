@@ -32,7 +32,7 @@
 #include "base/intmath.hh"
 #include "base/logging.hh"
 #include "base/trace.hh"
-#include "debug/Fetch.hh"
+#include "debug/Perceptron.hh"
 
 PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
 :   BPredUnit(params)
@@ -43,7 +43,7 @@ PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
     theta = (1.93 * numPerceptrons) + (numPerceptrons / 2);
     indexes.resize(numPerceptrons);
     weights.resize(numPerceptrons, std::vector<int>(numWeights, 0));
-    DPRINTF(Fetch, "Init hashed perceptron. %d perc, %d weights\n",
+    DPRINTF(PerceptronBP, "Init hashed perceptron. %d perc, %d weights\n",
         numPerceptrons, numWeights);
 }
 
@@ -65,7 +65,7 @@ PerceptronHashedBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
         y += weights[i][indexes[i]];
     }
     lastPrediction = y;
-    DPRINTF(Fetch, "Predict %d for %x\n", lastPrediction, branch_addr);
+    DPRINTF(PerceptronBP, "Predict %d for %x\n", lastPrediction, branch_addr);
     return y >= 0;
 }
 
@@ -77,7 +77,7 @@ PerceptronHashedBP::update(ThreadID tid, Addr branch_addr,
 {
     updateGlobalHist(taken);
     bool predict_taken = lastPrediction >= 0;
-    DPRINTF(Fetch, "Predicted/actual %d %d for %x\n",
+    DPRINTF(PerceptronBP, "Predicted/actual %d %d for %x\n",
         predict_taken, taken, branch_addr);
     if ((predict_taken != taken) || (abs(lastPrediction) <= theta)) {
         for (int i = 0; i < numPerceptrons; i++) {
