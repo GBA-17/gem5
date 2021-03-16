@@ -32,7 +32,7 @@
 #include "base/intmath.hh"
 #include "base/logging.hh"
 #include "base/trace.hh"
-#include "debug/Perceptron.hh"
+#include "debug/PerceptronBP.hh"
 
 PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
 :   BPredUnit(params)
