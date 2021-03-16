@@ -34,11 +34,11 @@
 #include "debug/Fetch.hh"
 
 PerceptronBasicBP::PerceptronBasicBP(const PerceptronBasicBPParams *params)
-:   BPredUnit(params),
-    globalHistSize(params->globalHistSize),
-    numPerceptrons(params->numPerceptrons),
-    globalHistory(0)
+:   BPredUnit(params)
 {
+    globalHistSize = params->globalHistSize;
+    numPerceptrons = params->numPerceptrons;
+    globalHistory = 0;
     perceptronTable.reserve(numPerceptrons);
     for (int i = 0; i < numPerceptrons; i++) {
         perceptronTable.push_back(Perceptron(globalHistSize));

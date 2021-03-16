@@ -35,14 +35,14 @@
 #include "debug/Fetch.hh"
 
 PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
-:   BPredUnit(params),
-    numWeights(params->numWeights),
-    numPerceptrons(params->numPerceptrons),
-    globalHistory(0)
+:   BPredUnit(params)
 {
-    weights.resize(numPerceptrons, std::vector<int>(numWeights, 0));
-    indexes.resize(numPerceptrons);
+    numWeights = params->numWeights;
+    numPerceptrons = params->numPerceptrons;
+    globalHistory = 0;
     theta = (1.93 * numPerceptrons) + (numPerceptrons / 2);
+    indexes.resize(numPerceptrons);
+    weights.resize(numPerceptrons, std::vector<int>(numWeights, 0));
 }
 
 void
@@ -73,7 +73,7 @@ PerceptronHashedBP::update(ThreadID tid, Addr branch_addr,
                 Addr corrTarget)
 {
     updateGlobalHist(taken);
-    predict_taken = lastPrediction >= 0;
+    bool predict_taken = lastPrediction >= 0;
     if ((predict_taken != taken) || (abs(lastPrediction) <= theta)) {
         for (int i = 0; i < numPerceptrons; i++) {
             if (taken) {
