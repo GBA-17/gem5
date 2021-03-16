@@ -28,6 +28,7 @@
 
 #include "cpu/pred/perceptron_hashed.hh"
 #include <algorithm>
+#include <cstdint>
 #include "base/intmath.hh"
 #include "base/logging.hh"
 #include "base/trace.hh"
@@ -40,6 +41,8 @@ PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
     globalHistory(0)
 {
     weights.resize(numPerceptrons, std::vector<int>(numWeights, 0));
+    indexes.resize(numPerceptrons);
+    theta = (1.93 * numPerceptrons) + (numPerceptrons / 2);
 }
 
 void
@@ -54,13 +57,13 @@ PerceptronHashedBP::btbUpdate(ThreadID tid, Addr branch_addr,
 bool
 PerceptronHashedBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
-    std::vector<int> indexes = computeIndex(branch_addr);
+    computeIndex(branch_addr);
     int y = 0;
     for (int i = 0; i < numPerceptrons; i++) {
         y += weights[i][indexes[i]];
     }
-    predict_taken = y >= 0;
-    return predict_taken;
+    lastPrediction = y;
+    return y >= 0;
 }
 
 void
@@ -69,7 +72,18 @@ PerceptronHashedBP::update(ThreadID tid, Addr branch_addr,
                 bool squashed, const StaticInstPtr & inst,
                 Addr corrTarget)
 {
-
+    updateGlobalHist(taken);
+    predict_taken = lastPrediction >= 0;
+    if ((predict_taken != taken) || (abs(lastPrediction) <= theta)) {
+        for (int i = 0; i < numPerceptrons; i++) {
+            if (taken) {
+                weights[i][indexes[i]]++;
+            }
+            else {
+                weights[i][indexes[i]]--;
+            }
+        }
+    }
 }
 
 void
@@ -78,17 +92,15 @@ PerceptronHashedBP::uncondBranch(ThreadID tid,
 {
 }
 
-std::vector<int> PerceptronHashedBP::computeIndex(Addr branch_addr)
+void PerceptronHashedBP::computeIndex(Addr branch_addr)
 {
-    std::vector<int> indexes;
-    indexes.push_back(branch_addr % numWeights);
+    indexes[0] = branch_addr % numWeights;
     int stride = std::max(1, int(64 / numPerceptrons));
     for (int i = 1; i < numPerceptrons; i++) {
         uint64_t bitmask = generateBitmask(stride*i);
         uint64_t histSegment = globalHistory & bitmask;
-        indexes.push_back((histSegment ^ branch_addr) % numWeights);
+        indexes[i] = (histSegment ^ branch_addr) % numWeights;
     }
-    return indexes;
 }
 
 void PerceptronHashedBP::updateGlobalHist(bool taken) {

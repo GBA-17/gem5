@@ -60,39 +60,29 @@ class PerceptronHashedBP : public BPredUnit
 {
   public:
     PerceptronHashedBP(const PerceptronHashedBPParams *params);
-
     bool lookup(ThreadID tid, Addr branch_addr, void * &bp_history);
-
     void update(ThreadID tid, Addr branch_addr, bool taken, void *bp_history,
                 bool squashed, const StaticInstPtr & inst, Addr corrTarget);
 
     // Required virtual functions (not implemented)
     void btbUpdate(ThreadID tid, Addr branch_addr, void * &bp_history);
-
     virtual void uncondBranch(ThreadID tid, Addr pc, void * &bp_history);
-
     void squash(ThreadID tid, void *bp_history)
     { assert(bp_history == NULL); }
 
   private:
     
-    std::vector<int> computeIndex(Addr branch_addr);
-
+    void computeIndex(Addr branch_addr);
     void updateGlobalHist(bool taken);
-
     uint64_t generateBitmask(int bits);
 
     std::vector<std::vector<int>> weights;
-
+    std::vector<int> indexes;
     uint64_t globalHistory;
-
     size_t numPerceptrons;
-
     size_t numWeights;
-
     uint theta;
-
-    bool predict_taken;
+    int lastPrediction;
 
 };
 
