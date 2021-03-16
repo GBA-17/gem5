@@ -57,7 +57,7 @@ PerceptronHashedBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
     std::vector<int> indexes = computeIndex(branch_addr);
     int y = 0;
     for (int i = 0; i < numPerceptrons; i++) {
-        y += weights[i, indexes[i]];
+        y += weights[i][indexes[i]];
     }
     predict_taken = y >= 0;
     return predict_taken;
@@ -82,7 +82,7 @@ std::vector<int> PerceptronHashedBP::computeIndex(Addr branch_addr)
 {
     std::vector<int> indexes;
     indexes.push_back(branch_addr % numWeights);
-    int stride = max(1, 64 / numPerceptrons);
+    int stride = std::max(1, 64 / numPerceptrons);
     for (int i = 1; i < numPerceptrons; i++) {
         uint64_t bitmask = generateBitmask(stride*i);
         uint64_t histSegment = globalHistory & bitmask;

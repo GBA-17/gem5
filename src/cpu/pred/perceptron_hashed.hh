@@ -76,7 +76,7 @@ class PerceptronHashedBP : public BPredUnit
 
   private:
     
-    std::vector<int> computeIndex(Addr branch_addr)
+    std::vector<int> computeIndex(Addr branch_addr);
 
     void updateGlobalHist(bool taken);
 
