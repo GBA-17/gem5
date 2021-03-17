@@ -122,12 +122,12 @@ void PerceptronHashedBP::updateGlobalHist(bool taken) {
 }
 
 void PerceptronHashedBP::savePrediction(Addr branch_addr, int prediction) {
-    int index = branch_addr % savePredictions;
+    int index = branch_addr % savedPredictions;
     lastPrediction[index] = prediction;
 }
 
 int PerceptronHashedBP::getPrediction(Addr branch_addr) {
-    int index = branch_addr % savePredictions;
+    int index = branch_addr % savedPredictions;
     return lastPrediction[index];
 }
 

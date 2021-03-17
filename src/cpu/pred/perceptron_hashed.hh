@@ -75,7 +75,7 @@ class PerceptronHashedBP : public BPredUnit
     std::vector<int> computeIndex(Addr branch_addr);
     void updateGlobalHist(bool taken);
     uint64_t generateBitmask(int bits);
-    void savePrediction(Addr branch_addr);
+    void savePrediction(Addr branch_addr, int prediction);
     int getPrediction(Addr branch_addr);
 
     std::vector<std::vector<int>> weights;
