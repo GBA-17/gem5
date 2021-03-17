@@ -41,9 +41,7 @@ PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
     numPerceptrons = params->numPerceptrons;
     savedPredictions = params->savedPredictions;
     globalHistory = 0;
-    lastPrediction = 0;
     theta = (1.93 * numPerceptrons) + (numPerceptrons / 2);
-    indexes.resize(numPerceptrons);
     lastPrediction.resize(savedPredictions);
     weights.resize(numPerceptrons, std::vector<int>(numWeights, 0));
     DPRINTF(PerceptronBP, "Init_hashed_perceptron %d %d\n",
@@ -123,12 +121,12 @@ void PerceptronHashedBP::updateGlobalHist(bool taken) {
     }
 }
 
-void savePrediction(Addr branch_addr, int prediction) {
+void PerceptronHashedBP::savePrediction(Addr branch_addr, int prediction) {
     int index = branch_addr % savePredictions;
     lastPrediction[index] = prediction;
 }
 
-int getPrediction(Addr branch_addr) {
+int PerceptronHashedBP::getPrediction(Addr branch_addr) {
     int index = branch_addr % savePredictions;
     return lastPrediction[index];
 }
