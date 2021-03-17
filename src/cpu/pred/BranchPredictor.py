@@ -96,6 +96,7 @@ class PerceptronHashedBP(BranchPredictor):
     localCtrBits = Param.Unsigned(2, "Bits per counter")
     numPerceptrons = Param.Unsigned(16, "Number of perceptrons in table")
     numWeights = Param.Unsigned(32, "Number of weights per perceptron")
+    savedPredictions = Param.Unsigned(32, "Number of predictions to save")
 
 
 class TournamentBP(BranchPredictor):

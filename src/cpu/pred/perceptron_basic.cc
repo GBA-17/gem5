@@ -43,6 +43,8 @@ PerceptronBasicBP::PerceptronBasicBP(const PerceptronBasicBPParams *params)
     for (int i = 0; i < numPerceptrons; i++) {
         perceptronTable.push_back(Perceptron(globalHistSize));
     }
+    DPRINTF(PerceptronBP, "Init_basic_perceptron %d %d\n",
+        numPerceptrons, globalHistSize);
 }
 
 void
@@ -59,8 +61,8 @@ PerceptronBasicBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
     size_t index = computeIndex(branch_addr);
     int y = perceptronTable[index].predict(globalHistory);
-    DPRINTF(PerceptronBP, "lookup %x %d %d\n",
-                branch_addr, y, y >= 0);
+    DPRINTF(PerceptronBP, "lookup %x %d %d %d\n",
+                branch_addr, index, y, y >= 0);
     return y >= 0;
 }
 
