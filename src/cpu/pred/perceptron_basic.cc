@@ -74,7 +74,7 @@ PerceptronBasicBP::update(ThreadID tid, Addr branch_addr,
     perceptronTable[index].train(taken);
     updateGlobalHist(taken);
 
-    bool lastPrediction = perceptronTable[index].getLastPrediction();
+    int lastPrediction = perceptronTable[index].getLastPrediction();
     DPRINTF(PerceptronBP, "update %x %d %d\n",
         branch_addr, lastPrediction >= 0, taken);
 }
