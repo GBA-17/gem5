@@ -31,7 +31,7 @@
 #include "base/intmath.hh"
 #include "base/logging.hh"
 #include "base/trace.hh"
-#include "debug/Fetch.hh"
+#include "debug/PerceptronBP.hh"
 
 PerceptronBasicBP::PerceptronBasicBP(const PerceptronBasicBPParams *params)
 :   BPredUnit(params)
@@ -58,7 +58,10 @@ bool
 PerceptronBasicBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
 {
     size_t index = computeIndex(branch_addr);
-    return perceptronTable[index].predict(globalHistory);
+    int y = perceptronTable[index].predict(globalHistory);
+    DPRINTF(PerceptronBP, "lookup %x %d %d\n",
+                branch_addr, y, y >= 0);
+    return y >= 0;
 }
 
 void
@@ -70,6 +73,10 @@ PerceptronBasicBP::update(ThreadID tid, Addr branch_addr,
     size_t index = computeIndex(branch_addr);
     perceptronTable[index].train(taken);
     updateGlobalHist(taken);
+
+    bool lastPrediction = perceptronTable[index].getLastPrediction();
+    DPRINTF(PerceptronBP, "update %x %d %d\n",
+        branch_addr, lastPrediction >= 0, taken);
 }
 
 void

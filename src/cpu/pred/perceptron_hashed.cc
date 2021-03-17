@@ -43,7 +43,7 @@ PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
     theta = (1.93 * numPerceptrons) + (numPerceptrons / 2);
     indexes.resize(numPerceptrons);
     weights.resize(numPerceptrons, std::vector<int>(numWeights, 0));
-    DPRINTF(PerceptronBP, "Init hashed perceptron. %d perc, %d weights\n",
+    DPRINTF(PerceptronBP, "Init_hashed_perceptron %d %d\n",
         numPerceptrons, numWeights);
 }
 
@@ -64,8 +64,9 @@ PerceptronHashedBP::lookup(ThreadID tid, Addr branch_addr, void * &bp_history)
     for (int i = 0; i < numPerceptrons; i++) {
         y += weights[i][indexes[i]];
     }
+    DPRINTF(PerceptronBP, "lookup %x %d %d\n",
+        branch_addr, y, y >= 0);
     lastPrediction = y;
-    DPRINTF(PerceptronBP, "Predict %d for %x\n", lastPrediction, branch_addr);
     return y >= 0;
 }
 
@@ -77,8 +78,8 @@ PerceptronHashedBP::update(ThreadID tid, Addr branch_addr,
 {
     updateGlobalHist(taken);
     bool predict_taken = lastPrediction >= 0;
-    DPRINTF(PerceptronBP, "Predicted/actual %d %d for %x\n",
-        predict_taken, taken, branch_addr);
+    DPRINTF(PerceptronBP, "update %x %d %d\n",
+        branch_addr, predict_taken, taken);
     if ((predict_taken != taken) || (abs(lastPrediction) <= theta)) {
         for (int i = 0; i < numPerceptrons; i++) {
             if (taken) {

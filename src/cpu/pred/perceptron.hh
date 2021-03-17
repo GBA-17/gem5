@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <stdlib.h>
 #include <vector>
+#include "debug/PerceptronBP.hh"
 
 class Perceptron {
     public:
@@ -16,7 +17,7 @@ class Perceptron {
             weights = std::vector<int>(size, init_weight);
         }
 
-        bool predict(uint64_t global_hist) {
+        int predict(uint64_t global_hist) {
             last_input = (global_hist << 1) | 0x1;
             int y = weights[0];
             for (int i = 1; i < size; i++) {
@@ -28,7 +29,11 @@ class Perceptron {
                 }
             }
             last_prediction = y;
-            return y >= 0;
+            return y;
+        }
+
+        int getLastPrediction() {
+            return last_prediction;
         }
 
         void train(bool taken) {
