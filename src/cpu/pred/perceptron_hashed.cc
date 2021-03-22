@@ -40,6 +40,7 @@ PerceptronHashedBP::PerceptronHashedBP(const PerceptronHashedBPParams *params)
     numWeights = params->numWeights;
     numPerceptrons = params->numPerceptrons;
     savedPredictions = params->savedPredictions;
+    globalHistSize = params->globalHistSize;
     globalHistory = 0;
     theta = (1.93 * numPerceptrons) + (numPerceptrons / 2);
     lastPrediction.resize(savedPredictions);
@@ -105,7 +106,7 @@ std::vector<int> PerceptronHashedBP::computeIndex(Addr branch_addr)
 {
     std::vector<int> indexes;
     indexes.push_back(branch_addr % numWeights);
-    int stride = std::max(1, int(64 / numPerceptrons));
+    int stride = std::max(1, int(globalHistSize / numPerceptrons));
     for (int i = 1; i < numPerceptrons; i++) {
         uint64_t bitmask = generateBitmask(stride*i);
         uint64_t histSegment = globalHistory & bitmask;
@@ -123,6 +124,8 @@ void PerceptronHashedBP::updateGlobalHist(bool taken) {
 
 void PerceptronHashedBP::savePrediction(Addr branch_addr, int prediction) {
     int index = branch_addr % savedPredictions;
+    DPRINTF(PerceptronBP, "save_prediction %x %d\n",
+        branch_addr, index);
     lastPrediction[index] = prediction;
 }
 

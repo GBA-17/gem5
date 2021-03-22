@@ -83,6 +83,7 @@ class PerceptronHashedBP : public BPredUnit
     size_t numPerceptrons;
     size_t numWeights;
     size_t savedPredictions;
+    size_t globalHistSize;
     uint theta;
     std::vector<int> lastPrediction;
 
