@@ -97,7 +97,7 @@ class PerceptronHashedBP(BranchPredictor):
     numPerceptrons = Param.Unsigned(16, "Number of perceptrons in table")
     numWeights = Param.Unsigned(32, "Number of weights per perceptron")
     savedPredictions = Param.Unsigned(32, "Number of predictions to save")
-    globalHistSize = Param.Unsigned(32, "Length of global history in bits")
+    globalHistSize = Param.Unsigned(64, "Length of global history in bits")
 
 
 class TournamentBP(BranchPredictor):
